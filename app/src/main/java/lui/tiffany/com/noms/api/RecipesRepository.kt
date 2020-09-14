@@ -1,20 +1,25 @@
 package lui.tiffany.com.noms.api
 
-import io.reactivex.Single
-import lui.tiffany.com.noms.common.extractBody
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import javax.inject.Inject
 
 interface RecipesRepository {
-    fun getRecipes(): Single<List<Recipe>>
+    fun getRecipes(): Flow<List<Recipe>>
 }
 
 class RecipesRepositoryImpl @Inject constructor(
-    private val recipesApi: RecipesApi
+    private val recipesApi: RecipesApi,
+    private val dispatchers: Dispatchers
 ) : RecipesRepository {
-    override fun getRecipes(): Single<List<Recipe>> {
-        return recipesApi.getRecipes()
-            .extractBody()
-            .map { it.results }
+
+    override fun getRecipes(): Flow<List<Recipe>> {
+        return flow {
+            val recipesResponse = recipesApi.getRecipes().results
+            emit(recipesResponse)
+        }.flowOn(dispatchers.Default)
     }
 
 }

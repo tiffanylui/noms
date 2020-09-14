@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
+import androidx.lifecycle.observe
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
 import lui.tiffany.com.noms.R
@@ -31,11 +31,9 @@ class SearchFragment : Fragment(R.layout.search_fragment) {
             adapter = searchAdapter
         }
 
-        val recipeNameObserver = Observer<List<RecipeRenderable>> {
-            searchAdapter.setData(it)
+        viewModel.recipesUsingFlow.observe(viewLifecycleOwner) { recipeRenderable ->
+            searchAdapter.setData(recipeRenderable)
         }
-
-        viewModel.recipeListRenderable.observe(viewLifecycleOwner, recipeNameObserver)
         return binding.root
     }
 
